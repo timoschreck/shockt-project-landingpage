@@ -177,6 +177,44 @@ audio {
     color: #ad1457;
 }
 
+/* Footer Links */
+.footer .footer-links {
+    margin-top: 1rem;
+}
+
+.footer .footer-links a {
+    color: #777;
+    text-decoration: underline;
+    font-size: 0.9rem;
+}
+
+.footer .footer-links a:hover {
+    color: #e91e63;
+}
+
+/* Legal Section */
+.legal {
+    font-size: 0.9rem;
+    color: #ccc;
+    line-height: 1.5;
+}
+
+.legal h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.5rem;
+    margin-top: 1.5rem;
+    color: #e91e63;
+}
+
+.legal a {
+    color: #e91e63;
+    text-decoration: underline;
+}
+
+.legal a:hover {
+    color: #ad1457;
+}
+
 /* Responsive tweaks */
 @media (max-width: 600px) {
     .hero .logo {
