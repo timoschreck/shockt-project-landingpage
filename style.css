@@ -215,6 +215,55 @@ audio {
     color: #ad1457;
 }
 
+/* Rating stars */
+.rating {
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.rating .star {
+    font-size: 1.5rem;
+    color: #888;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.rating .star.selected {
+    color: #ffd700;
+}
+
+.rating .rating-info {
+    /* Hide rating info by default.  Ratings are stored internally and not
+       displayed until moderated. */
+    display: none;
+}
+
+/* Comment section */
+.comment-section {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.comment-section textarea {
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: none;
+    background: #2a2a2a;
+    color: #fff;
+    resize: vertical;
+    min-height: 80px;
+}
+
+.comment-section .comment-message {
+    font-size: 0.85rem;
+    color: #e91e63;
+}
+
 /* Responsive tweaks */
 @media (max-width: 600px) {
     .hero .logo {

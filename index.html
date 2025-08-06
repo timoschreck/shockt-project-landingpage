@@ -223,6 +223,127 @@
                     }
                 });
             });
+
+            // Dynamically add rating stars and comment sections for each song
+            var songItems = document.querySelectorAll('#album-songs .song');
+            songItems.forEach(function (song) {
+                var playCounter = song.querySelector('.play-count');
+                if (!playCounter) return;
+                var key = playCounter.dataset.key;
+                // Rating container
+                var ratingContainer = document.createElement('div');
+                ratingContainer.className = 'rating';
+                ratingContainer.dataset.key = key;
+                // Create five stars
+                for (var i = 1; i <= 5; i++) {
+                    var star = document.createElement('span');
+                    star.className = 'star';
+                    star.dataset.value = i;
+                    star.innerHTML = '\u2605'; // Unicode filled star
+                    ratingContainer.appendChild(star);
+                }
+                /*
+                 * We no longer display rating counts publicly.  Ratings are stored
+                 * internally in localStorage under the key "ratings_<songKey>".  When a
+                 * user rates a song, the value (1–5) is pushed to an array in
+                 * localStorage.  This ensures that ratings are collected but not shown
+                 * until they are approved by the site owner.  The rating container is
+                 * appended directly to the song without a visible count.
+                 */
+                song.appendChild(ratingContainer);
+                // Comment section
+                var commentSection = document.createElement('div');
+                commentSection.className = 'comment-section';
+                var textarea = document.createElement('textarea');
+                textarea.setAttribute('maxlength', '250');
+                textarea.setAttribute('placeholder', 'Kommentar (max. 250 Zeichen)');
+                var submitBtn = document.createElement('button');
+                submitBtn.className = 'btn secondary comment-submit';
+                submitBtn.textContent = 'Kommentar senden';
+                var msg = document.createElement('p');
+                msg.className = 'comment-message';
+                msg.style.display = 'none';
+                msg.textContent = 'Danke für deinen Kommentar! Er wird nach Überprüfung veröffentlicht.';
+                commentSection.appendChild(textarea);
+                commentSection.appendChild(submitBtn);
+                commentSection.appendChild(msg);
+                song.appendChild(commentSection);
+            });
+            // Rating click handler
+            document.addEventListener('click', function (e) {
+                if (e.target.classList.contains('star')) {
+                    var star = e.target;
+                    var ratingContainer = star.parentElement;
+                    var value = parseInt(star.dataset.value);
+                    var stars = ratingContainer.querySelectorAll('.star');
+                    stars.forEach(function (s, index) {
+                        if (index < value) {
+                            s.classList.add('selected');
+                        } else {
+                            s.classList.remove('selected');
+                        }
+                    });
+                    var key = ratingContainer.dataset.key;
+                    if (key) {
+                        // Store each individual rating value in an array to be
+                        // moderated later.  Comments and ratings are not publicly
+                        // displayed until approved by the site owner.
+                        var ratingsKey = 'ratings_' + key;
+                        var ratings = [];
+                        try {
+                            ratings = JSON.parse(localStorage.getItem(ratingsKey) || '[]');
+                        } catch (err) {
+                            ratings = [];
+                        }
+                        ratings.push(value);
+                        localStorage.setItem(ratingsKey, JSON.stringify(ratings));
+                        // Also update a total count to track how many times a song has been rated.
+                        var countKey = 'ratingCount_' + key;
+                        var currentCount = parseInt(localStorage.getItem(countKey) || '0');
+                        currentCount += 1;
+                        localStorage.setItem(countKey, currentCount);
+                        // Optionally store the last rating value; not publicly used.
+                        localStorage.setItem('lastRating_' + key, value);
+                    }
+                }
+            });
+            // Comment submission handler
+            document.addEventListener('click', function (e) {
+                if (e.target.classList.contains('comment-submit')) {
+                    e.preventDefault();
+                    var button = e.target;
+                    var commentSection = button.parentElement;
+                    var textarea = commentSection.querySelector('textarea');
+                    var message = commentSection.querySelector('.comment-message');
+                    var comment = textarea.value.trim();
+                    if (comment.length === 0) {
+                        return;
+                    }
+                    // Identify song key via closest .song element
+                    var songDiv = button.closest('.song');
+                    var playCounter = songDiv ? songDiv.querySelector('.play-count') : null;
+                    if (playCounter) {
+                        var key = playCounter.dataset.key;
+                        var commentsKey = 'comments_' + key;
+                        var existing = [];
+                        try {
+                            existing = JSON.parse(localStorage.getItem(commentsKey) || '[]');
+                        } catch (err) {
+                            existing = [];
+                        }
+                        existing.push(comment);
+                        localStorage.setItem(commentsKey, JSON.stringify(existing));
+                    }
+                    // Clear textarea and show thank you message
+                    textarea.value = '';
+                    if (message) {
+                        message.style.display = 'block';
+                        setTimeout(function () {
+                            message.style.display = 'none';
+                        }, 4000);
+                    }
+                }
+            });
         });
     </script>
 </body>
