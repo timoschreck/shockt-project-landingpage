@@ -110,6 +110,29 @@ audio {
     outline: none;
 }
 
+/* Album Cover */
+/* Style for the album cover image. It is centered, responsive and clickable. */
+#album-cover {
+    cursor: pointer;
+    width: 100%;
+    max-width: 400px;
+    display: block;
+    margin: 2rem auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Hide the songs container by default; it will be shown via JavaScript on click */
+#album-songs {
+    display: none;
+}
+
+/* Hidden play count counters for each song. These counters track how many times
+   each track has been played but are not visible to visitors. */
+.play-count {
+    display: none;
+}
+
 /* Contact Section */
 .contact-form {
     display: flex;

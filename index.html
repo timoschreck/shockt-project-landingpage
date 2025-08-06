@@ -31,13 +31,20 @@
     <!-- Music Section -->
     <section id="music" class="music section">
         <h2>Meine Tracks</h2>
-        <div class="songs">
+        <!-- Album cover displayed first. Clicking on it will reveal the songs list -->
+        <div class="album-container">
+            <img id="album-cover" src="album_cover.png" alt="No.1 – Von Sehnsucht, Zweifel und Kraft Album Cover" />
+        </div>
+        <!-- Song list hidden by default. It will be shown when the album cover is clicked -->
+        <div id="album-songs" class="songs">
             <div class="song">
                 <h3>Fremdes Glück... und so</h3>
                 <audio controls controlsList="nodownload">
                     <source src="songs/Fremdes Glueck... und so.mp3" type="audio/mpeg" />
                     Dein Browser unterstützt das Audioelement nicht.
                 </audio>
+                <!-- Hidden play count counter -->
+                <span class="play-count" data-key="fremdes-glueck">0</span>
             </div>
             <div class="song">
                 <h3>Genau Hier</h3>
@@ -45,6 +52,7 @@
                     <source src="songs/Genau Hier.mp3" type="audio/mpeg" />
                     Dein Browser unterstützt das Audioelement nicht.
                 </audio>
+                <span class="play-count" data-key="genau-hier">0</span>
             </div>
             <div class="song">
                 <h3>Magie</h3>
@@ -52,6 +60,7 @@
                     <source src="songs/Magie.mp3" type="audio/mpeg" />
                     Dein Browser unterstützt das Audioelement nicht.
                 </audio>
+                <span class="play-count" data-key="magie">0</span>
             </div>
             <div class="song">
                 <h3>Heute wird’s geil</h3>
@@ -59,6 +68,7 @@
                     <source src="songs/Heute wird’s geil.mp3" type="audio/mpeg" />
                     Dein Browser unterstützt das Audioelement nicht.
                 </audio>
+                <span class="play-count" data-key="heute-wirds-geil">0</span>
             </div>
             <div class="song">
                 <h3>Sehnsucht, Freiheit</h3>
@@ -66,6 +76,7 @@
                     <source src="songs/Sehnsucht, Freiheit.mp3" type="audio/mpeg" />
                     Dein Browser unterstützt das Audioelement nicht.
                 </audio>
+                <span class="play-count" data-key="sehnsucht-freiheit">0</span>
             </div>
             <div class="song">
                 <h3>Sonne im Block</h3>
@@ -73,6 +84,7 @@
                     <source src="songs/Sonne im Block.mp3" type="audio/mpeg" />
                     Dein Browser unterstützt das Audioelement nicht.
                 </audio>
+                <span class="play-count" data-key="sonne-im-block">0</span>
             </div>
             <div class="song">
                 <h3>Step by Step (Selbstrespekt)</h3>
@@ -80,6 +92,7 @@
                     <source src="songs/Step by Step (Selbstrespekt).mp3" type="audio/mpeg" />
                     Dein Browser unterstützt das Audioelement nicht.
                 </audio>
+                <span class="play-count" data-key="step-by-step-selbstrespekt">0</span>
             </div>
             <div class="song">
                 <h3>Traum bleibt</h3>
@@ -87,6 +100,7 @@
                     <source src="songs/Traum bleibt.mp3" type="audio/mpeg" />
                     Dein Browser unterstützt das Audioelement nicht.
                 </audio>
+                <span class="play-count" data-key="traum-bleibt">0</span>
             </div>
             <div class="song">
                 <h3>Was kommt</h3>
@@ -94,6 +108,7 @@
                     <source src="songs/Was kommt.mp3" type="audio/mpeg" />
                     Dein Browser unterstützt das Audioelement nicht.
                 </audio>
+                <span class="play-count" data-key="was-kommt">0</span>
             </div>
             <div class="song">
                 <h3>Zurück im Licht</h3>
@@ -101,6 +116,7 @@
                     <source src="songs/Zurück im Licht.mp3" type="audio/mpeg" />
                     Dein Browser unterstützt das Audioelement nicht.
                 </audio>
+                <span class="play-count" data-key="zurueck-im-licht">0</span>
             </div>
         </div>
     </section>
@@ -126,5 +142,51 @@
             <a href="https://tiktok.com" target="_blank">TikTok</a>
         </div>
     </footer>
+
+    <!-- Script to toggle visibility of songs when album cover is clicked
+         and to track play counts for each song. The play counts are stored
+         in localStorage and updated on each play event. The counters are hidden
+         from the user but increment behind the scenes. -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var cover = document.getElementById('album-cover');
+            var songsContainer = document.getElementById('album-songs');
+            // Hide songs container initially
+            if (songsContainer) {
+                songsContainer.style.display = 'none';
+            }
+            // Show songs when cover is clicked and hide the cover
+            if (cover && songsContainer) {
+                cover.addEventListener('click', function () {
+                    songsContainer.style.display = 'grid';
+                    cover.style.display = 'none';
+                });
+            }
+            // Initialize play counters for each song
+            var audioElements = document.querySelectorAll('#album-songs audio');
+            audioElements.forEach(function (audio) {
+                var parent = audio.parentElement;
+                var counter = parent.querySelector('.play-count');
+                if (!counter) return;
+                var key = counter.dataset.key;
+                // Load stored count from localStorage if available
+                if (key) {
+                    var stored = localStorage.getItem('playCount_' + key);
+                    if (stored !== null) {
+                        counter.textContent = stored;
+                    }
+                }
+                // Increment counter on each play event
+                audio.addEventListener('play', function () {
+                    var count = parseInt(counter.textContent) || 0;
+                    count += 1;
+                    counter.textContent = count;
+                    if (key) {
+                        localStorage.setItem('playCount_' + key, count);
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
