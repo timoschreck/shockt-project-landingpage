@@ -196,6 +196,20 @@
         </div>
     </footer>
 
+    <!-- User Info Modal for collecting mandatory user data before ratings/comments -->
+    <div id="user-info-modal" class="user-modal" style="display: none;">
+        <div class="user-modal-content">
+            <h3>Bitte registrieren Sie sich</h3>
+            <p>Um Bewertungen und Kommentare abzugeben, benötigen wir Ihren Vor- und Nachnamen sowie E-Mail oder Telefonnummer.</p>
+            <input type="text" id="firstName" placeholder="Vorname" required />
+            <input type="text" id="lastName" placeholder="Name" required />
+            <input type="email" id="userEmail" placeholder="E-Mail" />
+            <input type="tel" id="userPhone" placeholder="Telefonnummer" />
+            <p id="user-info-error" class="error-message" style="display:none;">Bitte füllen Sie alle Pflichtfelder aus.</p>
+            <button id="user-info-submit" class="btn primary" style="margin-top: 1rem;">Informationen absenden</button>
+        </div>
+    </div>
+
     <!-- Script to toggle visibility of songs when album cover is clicked
          and to track play counts for each song. The play counts are stored
          in localStorage and updated on each play event. The counters are hidden
@@ -231,6 +245,76 @@
 
                 // Track the currently playing audio so that only one song plays at a time.
                 var currentAudio = null;
+
+            // ----- User registration modal and gating logic -----
+            // References to modal elements and helper function to show the modal
+            var userModal = document.getElementById('user-info-modal');
+            var userSubmitBtn = document.getElementById('user-info-submit');
+            var userInfoError = document.getElementById('user-info-error');
+            function showUserModal() {
+                if (userModal) {
+                    userModal.style.display = 'flex';
+                }
+            }
+            // Hide rating and comment forms until the user has provided their contact information.
+            // If the visitor has not yet submitted the required user info (name and contact), hide
+            // all rating and comment input fields to prevent interactions.  After registration,
+            // these elements will be made visible again by the submission handler below.
+            if (!localStorage.getItem('userInfoSubmitted')) {
+                document.querySelectorAll('.rating, .comment-section').forEach(function (el) {
+                    el.style.display = 'none';
+                });
+            }
+            // Handle submission of the user registration form
+            if (userSubmitBtn) {
+                userSubmitBtn.addEventListener('click', function () {
+                    var firstNameEl = document.getElementById('firstName');
+                    var lastNameEl = document.getElementById('lastName');
+                    var emailEl = document.getElementById('userEmail');
+                    var phoneEl = document.getElementById('userPhone');
+                    var firstName = firstNameEl ? firstNameEl.value.trim() : '';
+                    var lastName = lastNameEl ? lastNameEl.value.trim() : '';
+                    var emailVal = emailEl ? emailEl.value.trim() : '';
+                    var phoneVal = phoneEl ? phoneEl.value.trim() : '';
+                    // Validate required fields: first/last name and at least one contact (email or phone)
+                    if (!firstName || !lastName || (!emailVal && !phoneVal)) {
+                        if (userInfoError) {
+                            userInfoError.textContent = 'Bitte geben Sie Vorname, Name und E‑Mail oder Telefonnummer an.';
+                            userInfoError.style.display = 'block';
+                        }
+                        return;
+                    }
+                    // Persist user data
+                    var info = { firstName: firstName, lastName: lastName, email: emailVal, phone: phoneVal };
+                    try {
+                        localStorage.setItem('userInfo', JSON.stringify(info));
+                    } catch (err) {
+                        // ignore storage errors
+                    }
+                    localStorage.setItem('userInfoSubmitted', 'true');
+                    // Hide the modal
+                    if (userModal) {
+                        userModal.style.display = 'none';
+                    }
+                    // Remove any existing rating/comment data stored in localStorage
+                    Object.keys(localStorage).forEach(function (k) {
+                        if (k.startsWith('ratings_') || k.startsWith('ratingCount_') || k.startsWith('lastRating_') || k.startsWith('comments_')) {
+                            localStorage.removeItem(k);
+                        }
+                    });
+                    // Show rating and comment input sections now that the user has registered.
+                    // Any previously collected ratings/comments have been cleared above, so new
+                    // submissions will be collected for moderation.  By making these elements
+                    // visible here, the user can leave new feedback after providing their details.
+                    document.querySelectorAll('.rating, .comment-section').forEach(function (el) {
+                        el.style.display = '';
+                    });
+                    // Reset any error message
+                    if (userInfoError) {
+                        userInfoError.style.display = 'none';
+                    }
+                });
+            }
 
                 audioElements.forEach(function (audio) {
                 var parent = audio.parentElement;
@@ -307,9 +391,16 @@
                 commentSection.appendChild(msg);
                 song.appendChild(commentSection);
             });
-            // Rating click handler
+            // Rating click handler with user info check
             document.addEventListener('click', function (e) {
                 if (e.target.classList.contains('star')) {
+                    // If user info has not been submitted, prompt for it and abort rating
+                    if (!localStorage.getItem('userInfoSubmitted')) {
+                        if (typeof showUserModal === 'function') {
+                            showUserModal();
+                        }
+                        return;
+                    }
                     var star = e.target;
                     var ratingContainer = star.parentElement;
                     var value = parseInt(star.dataset.value);
@@ -345,10 +436,17 @@
                     }
                 }
             });
-            // Comment submission handler
+            // Comment submission handler with user info check
             document.addEventListener('click', function (e) {
                 if (e.target.classList.contains('comment-submit')) {
                     e.preventDefault();
+                    // If user info has not been submitted, show modal and abort
+                    if (!localStorage.getItem('userInfoSubmitted')) {
+                        if (typeof showUserModal === 'function') {
+                            showUserModal();
+                        }
+                        return;
+                    }
                     var button = e.target;
                     var commentSection = button.parentElement;
                     var textarea = commentSection.querySelector('textarea');
