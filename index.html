@@ -213,9 +213,13 @@
                     // cover remains visible
                 });
             }
-            // Initialize play counters for each song
-            var audioElements = document.querySelectorAll('#album-songs audio');
-            audioElements.forEach(function (audio) {
+                // Initialize play counters for each song
+                var audioElements = document.querySelectorAll('#album-songs audio');
+
+                // Track the currently playing audio so that only one song plays at a time.
+                var currentAudio = null;
+
+                audioElements.forEach(function (audio) {
                 var parent = audio.parentElement;
                 var counter = parent.querySelector('.play-count');
                 if (!counter) return;
@@ -227,15 +231,22 @@
                         counter.textContent = stored;
                     }
                 }
-                // Increment counter on each play event
-                audio.addEventListener('play', function () {
-                    var count = parseInt(counter.textContent) || 0;
-                    count += 1;
-                    counter.textContent = count;
-                    if (key) {
-                        localStorage.setItem('playCount_' + key, count);
-                    }
-                });
+                    // Increment counter on each play event and ensure only one audio plays at a time
+                    audio.addEventListener('play', function () {
+                        // If another audio is currently playing, pause it
+                        if (currentAudio && currentAudio !== audio) {
+                            currentAudio.pause();
+                        }
+                        // Update the current audio reference
+                        currentAudio = audio;
+
+                        var count = parseInt(counter.textContent) || 0;
+                        count += 1;
+                        counter.textContent = count;
+                        if (key) {
+                            localStorage.setItem('playCount_' + key, count);
+                        }
+                    });
             });
 
             // Dynamically add rating stars and comment sections for each song
