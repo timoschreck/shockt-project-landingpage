@@ -121,6 +121,19 @@
                 <span class="play-count" data-key="zurueck-im-licht">0</span>
             </div>
         </div>
+        <!-- Button to open the album player. Shows an overlay with controls for sequential playback -->
+        <button id="play-all-btn" class="btn primary" style="margin: 1rem auto; display: block;">
+            Komplettes Album anhören
+        </button>
+        <!-- Album player overlay. Contains controls to navigate through the album when playing all songs -->
+        <div id="album-player" class="album-player" style="display: none;">
+            <p class="album-player-title"><strong>Album Player</strong></p>
+            <div class="player-controls">
+                <button id="prev-song-btn" class="btn secondary">Vorheriger Song</button>
+                <button id="stop-player-btn" class="btn secondary">Stopp</button>
+                <button id="next-song-btn" class="btn secondary">Nächster Song</button>
+            </div>
+        </div>
     </section>
 
     <!-- Contact Section -->
@@ -368,6 +381,97 @@
                         }, 4000);
                     }
                 }
+            });
+
+            // Album player functionality: sequential playback of all songs
+            var playAllBtn = document.getElementById('play-all-btn');
+            var albumPlayer = document.getElementById('album-player');
+            var prevBtn = document.getElementById('prev-song-btn');
+            var nextBtn = document.getElementById('next-song-btn');
+            var stopBtn = document.getElementById('stop-player-btn');
+            // Create an array from NodeList of audio elements for sequential control
+            var albumAudios = Array.prototype.slice.call(audioElements);
+            var albumPlaying = false;
+            var playIndex = 0;
+            /**
+             * Play a song at the given index and update currentAudio. Stops any
+             * currently playing track. If index is outside bounds, nothing happens.
+             */
+            function playSong(index) {
+                if (index < 0 || index >= albumAudios.length) {
+                    return;
+                }
+                // Pause and reset current audio if another song is playing
+                if (currentAudio && !currentAudio.paused) {
+                    currentAudio.pause();
+                    currentAudio.currentTime = 0;
+                }
+                currentAudio = albumAudios[index];
+                playIndex = index;
+                albumPlaying = true;
+                currentAudio.play();
+            }
+            /** Play the next song in the album (wrap to first if at end) */
+            function playNext() {
+                var nextIndex = playIndex + 1;
+                if (nextIndex >= albumAudios.length) {
+                    nextIndex = 0;
+                }
+                playSong(nextIndex);
+            }
+            /** Play the previous song in the album (wrap to last if at beginning) */
+            function playPrev() {
+                var prevIndex = playIndex - 1;
+                if (prevIndex < 0) {
+                    prevIndex = albumAudios.length - 1;
+                }
+                playSong(prevIndex);
+            }
+            /** Stop all playback and reset state */
+            function stopAll() {
+                albumPlaying = false;
+                if (currentAudio) {
+                    currentAudio.pause();
+                    currentAudio.currentTime = 0;
+                }
+            }
+            // When the play-all button is clicked, show the album player and start with the first track
+            if (playAllBtn && albumPlayer) {
+                playAllBtn.addEventListener('click', function () {
+                    // Show overlay and make sure songs list and back button are visible
+                    albumPlayer.style.display = 'block';
+                    if (songsContainer) {
+                        songsContainer.style.display = 'grid';
+                    }
+                    if (backButton) {
+                        backButton.style.display = 'inline-block';
+                    }
+                    playSong(0);
+                });
+            }
+            // Hook up control buttons
+            if (nextBtn) {
+                nextBtn.addEventListener('click', function () {
+                    playNext();
+                });
+            }
+            if (prevBtn) {
+                prevBtn.addEventListener('click', function () {
+                    playPrev();
+                });
+            }
+            if (stopBtn) {
+                stopBtn.addEventListener('click', function () {
+                    stopAll();
+                });
+            }
+            // Automatically play next track when the current track ends, if album is playing
+            albumAudios.forEach(function (aud) {
+                aud.addEventListener('ended', function () {
+                    if (albumPlaying) {
+                        playNext();
+                    }
+                });
             });
         });
     </script>
