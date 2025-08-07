@@ -256,12 +256,10 @@
                     userModal.style.display = 'flex';
                 }
             }
-            // Hide rating and comment forms until the user has provided their contact information.
-            // If the visitor has not yet submitted the required user info (name and contact), hide
-            // all rating and comment input fields to prevent interactions.  After registration,
-            // these elements will be made visible again by the submission handler below.
+            // Hide comment forms until the user has provided their contact information.
+            // Star ratings are always visible, but comment sections are gated behind registration.
             if (!localStorage.getItem('userInfoSubmitted')) {
-                document.querySelectorAll('.rating, .comment-section').forEach(function (el) {
+                document.querySelectorAll('.comment-section').forEach(function (el) {
                     el.style.display = 'none';
                 });
             }
@@ -302,11 +300,10 @@
                             localStorage.removeItem(k);
                         }
                     });
-                    // Show rating and comment input sections now that the user has registered.
-                    // Any previously collected ratings/comments have been cleared above, so new
-                    // submissions will be collected for moderation.  By making these elements
-                    // visible here, the user can leave new feedback after providing their details.
-                    document.querySelectorAll('.rating, .comment-section').forEach(function (el) {
+                    // Show comment input sections now that the user has registered.  Ratings
+                    // remain visible at all times.  Any previously collected ratings/comments
+                    // have been cleared above, so new submissions will be collected for moderation.
+                    document.querySelectorAll('.comment-section').forEach(function (el) {
                         el.style.display = '';
                     });
                     // Reset any error message
@@ -394,13 +391,8 @@
             // Rating click handler with user info check
             document.addEventListener('click', function (e) {
                 if (e.target.classList.contains('star')) {
-                    // If user info has not been submitted, prompt for it and abort rating
-                    if (!localStorage.getItem('userInfoSubmitted')) {
-                        if (typeof showUserModal === 'function') {
-                            showUserModal();
-                        }
-                        return;
-                    }
+                    // Star ratings are collected regardless of registration.  Comments still
+                    // require registration, but anyone can click on stars to rate a song.
                     var star = e.target;
                     var ratingContainer = star.parentElement;
                     var value = parseInt(star.dataset.value);
@@ -571,6 +563,60 @@
                     }
                 });
             });
+
+            /**
+             * Send a weekly summary of song ratings via a mailto link.  This function
+             * checks when the last report was generated and, if more than seven days
+             * have passed, compiles the rating counts for each song and opens the
+             * user’s mail client with a pre‑filled email to contact@shockt-project.de.
+             *
+             * The summary lists each song title and the number of times it has been
+             * rated.  The last sent time is stored in localStorage under
+             * "ratingsReportLastSent" to avoid sending more than once per week.
+             */
+            function sendWeeklyRatingReport() {
+                try {
+                    var lastSentStr = localStorage.getItem('ratingsReportLastSent');
+                    var now = new Date();
+                    var send = false;
+                    if (!lastSentStr) {
+                        send = true;
+                    } else {
+                        var lastSentDate = new Date(lastSentStr);
+                        // If more than 7 days have elapsed since the last report, send again
+                        if (now - lastSentDate > 7 * 24 * 60 * 60 * 1000) {
+                            send = true;
+                        }
+                    }
+                    if (!send) {
+                        return;
+                    }
+                    // Compile rating counts for each song
+                    var reportLines = [];
+                    document.querySelectorAll('#album-songs .song .play-count').forEach(function (counter) {
+                        var key = counter.dataset.key;
+                        var count = parseInt(localStorage.getItem('ratingCount_' + key) || '0', 10);
+                        var titleEl = counter.parentElement.querySelector('h3');
+                        var title = titleEl ? titleEl.textContent.trim() : key;
+                        reportLines.push(title + ': ' + count + ' Bewertungen');
+                    });
+                    if (reportLines.length === 0) {
+                        return;
+                    }
+                    var subject = encodeURIComponent('Wöchentlicher Bewertungsbericht');
+                    var body = encodeURIComponent(reportLines.join('\n'));
+                    var mailto = 'mailto:contact@shockt-project.de?subject=' + subject + '&body=' + body;
+                    // Defer the mailto navigation slightly so it does not block page initialization
+                    setTimeout(function () {
+                        window.location.href = mailto;
+                    }, 100);
+                    localStorage.setItem('ratingsReportLastSent', now.toISOString());
+                } catch (err) {
+                    // Ignore storage or navigation errors silently
+                }
+            }
+            // Trigger the weekly rating report on page load
+            sendWeeklyRatingReport();
         });
     </script>
 </body>
