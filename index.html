@@ -32,11 +32,13 @@
     <section id="music" class="music section">
         <h2>Meine Tracks</h2>
         <!-- Album cover displayed first. Clicking on it will reveal the songs list -->
-        <div class="album-container">
-            <img id="album-cover" src="album_cover.png" alt="No.1 – Von Sehnsucht, Zweifel und Kraft Album Cover" />
-        </div>
-        <!-- Song list hidden by default. It will be shown when the album cover is clicked -->
-        <div id="album-songs" class="songs">
+            <div class="album-container">
+                <img id="album-cover" src="album_cover.png" alt="No.1 – Von Sehnsucht, Zweifel und Kraft Album Cover" />
+            </div>
+            <!-- Back button for returning to the album cover view. Hidden by default and shown when songs are visible. -->
+            <button id="back-button" class="btn secondary" style="display:none; margin: 1rem auto;">Zurück</button>
+            <!-- Song list hidden by default. It will be shown when the album cover is clicked -->
+            <div id="album-songs" class="songs">
             <div class="song">
            <h3>Fremdes Glück</h3>
                 <audio controls controlsList="nodownload" oncontextmenu="return false;">
@@ -189,15 +191,26 @@
         document.addEventListener('DOMContentLoaded', function () {
             var cover = document.getElementById('album-cover');
             var songsContainer = document.getElementById('album-songs');
-            // Hide songs container initially
+            var backButton = document.getElementById('back-button');
+            // Hide songs container and back button initially
             if (songsContainer) {
                 songsContainer.style.display = 'none';
             }
-            // Show songs when cover is clicked and hide the cover
-            if (cover && songsContainer) {
+            if (backButton) {
+                backButton.style.display = 'none';
+            }
+            // Show songs when cover is clicked; keep the cover visible and show the back button
+            if (cover && songsContainer && backButton) {
                 cover.addEventListener('click', function () {
                     songsContainer.style.display = 'grid';
-                    cover.style.display = 'none';
+                    backButton.style.display = 'inline-block';
+                    // keep cover visible
+                });
+                // Hide songs and back button when back button is clicked
+                backButton.addEventListener('click', function () {
+                    songsContainer.style.display = 'none';
+                    backButton.style.display = 'none';
+                    // cover remains visible
                 });
             }
             // Initialize play counters for each song
