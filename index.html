@@ -140,10 +140,32 @@
     <!-- Contact Section -->
     <section id="contact" class="contact section">
         <h2>Kontakt / Booking</h2>
-        <form class="contact-form">
-            <input type="text" name="name" placeholder="Name" required />
-            <input type="email" name="email" placeholder="E-Mail" required />
-            <textarea name="message" placeholder="Nachricht" rows="4" required></textarea>
+        <!--
+            Die Kontakt‑/Booking‑Sektion enthielt bisher nur ein Formular ohne
+            serverseitige Verarbeitung. Dadurch wurden die eingegebenen Daten
+            lediglich an die URL angehängt (GET‑Parameter) und es erfolgte keine
+            Zustellung der Nachricht an den Künstler. Um eine einfache und
+            zuverlässige Übermittlung per E‑Mail zu ermöglichen, verwenden wir
+            hier ein `mailto:`‑Formular.  Beim Absenden öffnet sich der
+            Standard‑E‑Mail‑Client des Nutzers mit einer vorbefüllten
+            Nachricht an die im Impressum hinterlegte Adresse.  Die Felder
+            „Name“, „E‑Mail“ und „Nachricht“ werden dabei als
+            Parameter übergeben.
+
+            Hinweis: Diese Lösung erfordert keinen eigenen Back‑End‑Server,
+            sendet aber auch keine Daten automatisch.  Benutzer können die
+            vorgefertigte E‑Mail noch anpassen, bevor sie sie endgültig
+            versenden.  Sollte künftig ein serverseitiges Skript oder ein
+            externer Dienst wie Formspree genutzt werden, kann das
+            `action`‑Attribut entsprechend angepasst werden.
+        -->
+        <form class="contact-form"
+              action="mailto:contact@shockt-project.de"
+              method="post"
+              enctype="text/plain">
+            <input type="text" name="Name" placeholder="Name" required />
+            <input type="email" name="Email" placeholder="E‑Mail" required />
+            <textarea name="Nachricht" placeholder="Nachricht" rows="4" required></textarea>
             <button type="submit" class="btn secondary">Senden</button>
         </form>
     </section>
