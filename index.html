@@ -245,7 +245,24 @@
                 var audioElements = document.querySelectorAll('#album-songs audio');
 
                 // Track the currently playing audio so that only one song plays at a time.
-                var currentAudio = null;
+        var currentAudio = null;
+
+        // Increment page view counter with timestamp.  This records each visit in
+        // localStorage so that weekly reports can include the number of site
+        // visits.  Each entry is an ISO timestamp string.  Errors in
+        // localStorage access are silently ignored to avoid breaking the page.
+        try {
+            var pageViews = [];
+            try {
+                pageViews = JSON.parse(localStorage.getItem('pageViews') || '[]');
+            } catch (err) {
+                pageViews = [];
+            }
+            pageViews.push(new Date().toISOString());
+            localStorage.setItem('pageViews', JSON.stringify(pageViews));
+        } catch (err) {
+            // ignore storage errors
+        }
 
             // ----- User registration modal and gating logic -----
             // References to modal elements and helper function to show the modal
@@ -340,6 +357,21 @@
                         counter.textContent = count;
                         if (key) {
                             localStorage.setItem('playCount_' + key, count);
+                            // Also record each play with a timestamp so weekly
+                            // summaries can report how many times a song was played.
+                            try {
+                                var histKey = 'playHistory_' + key;
+                                var history = [];
+                                try {
+                                    history = JSON.parse(localStorage.getItem(histKey) || '[]');
+                                } catch (e) {
+                                    history = [];
+                                }
+                                history.push(new Date().toISOString());
+                                localStorage.setItem(histKey, JSON.stringify(history));
+                            } catch (err) {
+                                // ignore errors
+                            }
                         }
                     });
             });
@@ -417,8 +449,21 @@
                         } catch (err) {
                             ratings = [];
                         }
-                        ratings.push(value);
-                        localStorage.setItem(ratingsKey, JSON.stringify(ratings));
+                        // Convert any existing numeric ratings to objects with a
+                        // date property so we can generate weekly summaries.  If
+                        // an entry is a number, treat it as a rating with no
+                        // specific date (assumed current week in reporting).
+                        var normalized = [];
+                        ratings.forEach(function (entry) {
+                            if (typeof entry === 'number') {
+                                normalized.push({ value: entry, date: null });
+                            } else if (entry && typeof entry === 'object' && 'value' in entry) {
+                                normalized.push(entry);
+                            }
+                        });
+                        // Add the new rating with a timestamp
+                        normalized.push({ value: value, date: new Date().toISOString() });
+                        localStorage.setItem(ratingsKey, JSON.stringify(normalized));
                         // Also update a total count to track how many times a song has been rated.
                         var countKey = 'ratingCount_' + key;
                         var currentCount = parseInt(localStorage.getItem(countKey) || '0');
@@ -617,7 +662,133 @@
                 }
             }
             // Trigger the weekly rating report on page load
-            sendWeeklyRatingReport();
+            // sendWeeklyRatingReport();
+
+            /**
+             * Compile a weekly summary including page views, song play counts and
+             * rating distributions for each song.  The summary is then passed to
+             * a mailto link so the user’s email client can send the report to
+             * contact@shockt-project.de.  The report is only sent once per
+             * 7‑day period, based on the timestamp stored in localStorage
+             * under "weeklyReportLastSent".  Rating distributions count how
+             * many times each rating value (1–5) was recorded during the last
+             * seven days.  If a rating entry in localStorage does not include
+             * a timestamp (legacy numeric entries), it is treated as having
+             * occurred within the current week.
+             */
+            function sendWeeklyReport() {
+                try {
+                    var lastSentStr = localStorage.getItem('weeklyReportLastSent');
+                    var now = new Date();
+                    var shouldSend = false;
+                    if (!lastSentStr) {
+                        shouldSend = true;
+                    } else {
+                        var lastSentDate = new Date(lastSentStr);
+                        if (now - lastSentDate > 7 * 24 * 60 * 60 * 1000) {
+                            shouldSend = true;
+                        }
+                    }
+                    if (!shouldSend) {
+                        return;
+                    }
+                    var oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                    // Count page views within the last week
+                    var pageViewsCount = 0;
+                    try {
+                        var pv = JSON.parse(localStorage.getItem('pageViews') || '[]');
+                        pv.forEach(function (ts) {
+                            try {
+                                var d = new Date(ts);
+                                if (isNaN(d.getTime()) || d >= oneWeekAgo) {
+                                    pageViewsCount += 1;
+                                }
+                            } catch (ex) {
+                                // treat invalid timestamps as within the week
+                                pageViewsCount += 1;
+                            }
+                        });
+                    } catch (ex) {
+                        pageViewsCount = 0;
+                    }
+                    var reportLines = [];
+                    reportLines.push('Seitenaufrufe (diese Woche): ' + pageViewsCount);
+                    // Compile per-song play counts and rating distributions
+                    document.querySelectorAll('#album-songs .song').forEach(function (songDiv) {
+                        var titleEl = songDiv.querySelector('h3');
+                        var title = titleEl ? titleEl.textContent.trim() : '';
+                        var playCounter = songDiv.querySelector('.play-count');
+                        var key = playCounter ? playCounter.dataset.key : null;
+                        var playCount = 0;
+                        if (key) {
+                            // Count plays in the last week
+                            try {
+                                var histKey = 'playHistory_' + key;
+                                var history = JSON.parse(localStorage.getItem(histKey) || '[]');
+                                history.forEach(function (ts) {
+                                    try {
+                                        var d = new Date(ts);
+                                        if (isNaN(d.getTime()) || d >= oneWeekAgo) {
+                                            playCount += 1;
+                                        }
+                                    } catch (ex) {
+                                        playCount += 1;
+                                    }
+                                });
+                            } catch (ex) {
+                                playCount = 0;
+                            }
+                        }
+                        // Compute rating distribution 1–5 for this song
+                        var distribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+                        if (key) {
+                            try {
+                                var ratingsKey = 'ratings_' + key;
+                                var ratings = JSON.parse(localStorage.getItem(ratingsKey) || '[]');
+                                ratings.forEach(function (entry) {
+                                    var val = null;
+                                    var dateVal = null;
+                                    if (typeof entry === 'number') {
+                                        val = entry;
+                                        dateVal = null;
+                                    } else if (entry && typeof entry === 'object' && 'value' in entry) {
+                                        val = entry.value;
+                                        dateVal = entry.date ? new Date(entry.date) : null;
+                                    }
+                                    if (val >= 1 && val <= 5) {
+                                        if (!dateVal || isNaN(dateVal.getTime()) || dateVal >= oneWeekAgo) {
+                                            distribution[val] = (distribution[val] || 0) + 1;
+                                        }
+                                    }
+                                });
+                            } catch (ex) {
+                                // ignore errors
+                            }
+                        }
+                        var ratingParts = [];
+                        for (var i = 1; i <= 5; i++) {
+                            ratingParts.push(i + ': ' + (distribution[i] || 0));
+                        }
+                        var line = title + ': ' + playCount + ' Abspielungen; Bewertungen – ' + ratingParts.join(' | ');
+                        reportLines.push(line);
+                    });
+                    if (reportLines.length === 0) {
+                        return;
+                    }
+                        // Compose email subject and body
+                    var subject = encodeURIComponent('Wöchentlicher Bericht shockT project');
+                    var body = encodeURIComponent(reportLines.join('\n'));
+                    var mailtoLink = 'mailto:contact@shockt-project.de?subject=' + subject + '&body=' + body;
+                    setTimeout(function () {
+                        window.location.href = mailtoLink;
+                    }, 200);
+                    localStorage.setItem('weeklyReportLastSent', now.toISOString());
+                } catch (err) {
+                    // ignore errors
+                }
+            }
+            // Trigger the weekly report on page load
+            sendWeeklyReport();
         });
     </script>
 </body>
