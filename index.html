@@ -394,6 +394,18 @@
                             } catch (err) {
                                 // ignore errors
                             }
+                            // Send play count to Supabase
+                            try {
+                                // Determine song title from DOM
+                                var songDiv = audio.closest('.song');
+                                var titleEl = songDiv ? songDiv.querySelector('h3') : null;
+                                var title = titleEl ? titleEl.textContent.trim() : key;
+                                if (typeof updateSongStats === 'function') {
+                                    updateSongStats(key, title, 1, 0, 0, 0);
+                                }
+                            } catch (err) {
+                                // ignore errors when Supabase is not configured
+                            }
                         }
                     });
             });
@@ -493,6 +505,18 @@
                         localStorage.setItem(countKey, currentCount);
                         // Optionally store the last rating value; not publicly used.
                         localStorage.setItem('lastRating_' + key, value);
+
+                        // Send rating to Supabase
+                        try {
+                            var songDiv = ratingContainer.closest('.song');
+                            var titleEl = songDiv ? songDiv.querySelector('h3') : null;
+                            var title = titleEl ? titleEl.textContent.trim() : key;
+                            if (typeof updateSongStats === 'function') {
+                                updateSongStats(key, title, 0, 1, value, 0);
+                            }
+                        } catch (err) {
+                            // ignore errors when Supabase is not configured
+                        }
                     }
                 }
             });
@@ -529,6 +553,17 @@
                         }
                         existing.push(comment);
                         localStorage.setItem(commentsKey, JSON.stringify(existing));
+
+                        // Send comment count to Supabase
+                        try {
+                            var songTitleEl = songDiv ? songDiv.querySelector('h3') : null;
+                            var songTitle = songTitleEl ? songTitleEl.textContent.trim() : key;
+                            if (typeof updateSongStats === 'function') {
+                                updateSongStats(key, songTitle, 0, 0, 0, 1);
+                            }
+                        } catch (err) {
+                            // ignore errors when Supabase is not configured
+                        }
                     }
                     // Clear textarea and show thank you message
                     textarea.value = '';
@@ -813,5 +848,52 @@
             sendWeeklyReport();
         });
     </script>
-</body>
-</html>
+    <!-- Supabase client and helper functions -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+      // Initialize Supabase client. Replace placeholders with your Supabase URL and anon key.
+      const supabaseUrl = 'YOUR_SUPABASE_URL';
+      const supabaseKey = 'YOUR_SUPABASE_ANON_KEY';
+      const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+      /**
+       * Update song statistics in Supabase.
+       *
+       * @param {string} key - unique key for the song (e.g., data-key attribute)
+       * @param {string} title - human-readable song title
+       * @param {number} playDelta - increment for play_count
+       * @param {number} ratingDelta - increment for rating_count
+       * @param {number} ratingValue - value added to rating_total (0 if none)
+       * @param {number} commentDelta - increment for comment_count
+       */
+      async function updateSongStats(key, title, playDelta = 0, ratingDelta = 0, ratingValue = 0, commentDelta = 0) {
+        try {
+          // Fetch existing record for this song
+          const { data: existing } = await supabase
+            .from('song_stats')
+            .select('*')
+            .eq('song_key', key)
+            .single();
+          let play_count = existing?.play_count ?? 0;
+          let rating_total = existing?.rating_total ?? 0;
+          let rating_count = existing?.rating_count ?? 0;
+          let comment_count = existing?.comment_count ?? 0;
+          play_count += playDelta;
+          rating_total += ratingValue;
+          rating_count += ratingDelta;
+          comment_count += commentDelta;
+          await supabase.from('song_stats').upsert({
+            song_key: key,
+            song_title: title,
+            play_count,
+            rating_total,
+            rating_count,
+            comment_count,
+          });
+        } catch (error) {
+          // If Supabase is not configured or fails, silently ignore to avoid breaking the page
+        }
+      }
+    </script>
+    </body>
+    </html>
