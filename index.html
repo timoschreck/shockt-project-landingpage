@@ -852,8 +852,13 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
       // Initialize Supabase client. Replace placeholders with your Supabase URL and anon key.
-      const supabaseUrl = 'YOUR_SUPABASE_URL';
-      const supabaseKey = 'YOUR_SUPABASE_ANON_KEY';
+      // Supabase project configuration
+      // Use the project's REST endpoint as the Supabase URL and the provided
+      // anon key for public client access. These values are safe to expose in
+      // client-side code as long as Row Level Security (RLS) policies are
+      // correctly configured in Supabase.
+      const supabaseUrl = 'https://jycgeopnemncxdqkubam.supabase.co';
+      const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5Y2dlb3BuZW1uY3hkcWt1YmFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NjkxOTksImV4cCI6MjA3MDI0NTE5OX0.libdmvl7SprUTCIMZVtP8E2HjoiSwFqs0Mb2I-He5jA';
       const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
       /**
