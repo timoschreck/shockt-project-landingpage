@@ -859,7 +859,10 @@
       // correctly configured in Supabase.
       const supabaseUrl = 'https://jycgeopnemncxdqkubam.supabase.co';
       const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5Y2dlb3BuZW1uY3hkcWt1YmFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NjkxOTksImV4cCI6MjA3MDI0NTE5OX0.libdmvl7SprUTCIMZVtP8E2HjoiSwFqs0Mb2I-He5jA';
-      const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+      // Create a Supabase client instance. Use a distinct variable name (supabaseClient)
+      // to avoid shadowing the global `supabase` object. If we reuse the name "supabase"
+      // here, JavaScript will throw a ReferenceError due to the temporal dead zone.
+      const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
       /**
        * Update song statistics in Supabase.
@@ -874,7 +877,7 @@
       async function updateSongStats(key, title, playDelta = 0, ratingDelta = 0, ratingValue = 0, commentDelta = 0) {
         try {
           // Fetch existing record for this song
-          const { data: existing } = await supabase
+               const { data: existing } = await supabaseClient
             .from('song_stats')
             .select('*')
             .eq('song_key', key)
@@ -887,7 +890,7 @@
           rating_total += ratingValue;
           rating_count += ratingDelta;
           comment_count += commentDelta;
-          await supabase.from('song_stats').upsert({
+               await supabaseClient.from('song_stats').upsert({
             song_key: key,
             song_title: title,
             play_count,
