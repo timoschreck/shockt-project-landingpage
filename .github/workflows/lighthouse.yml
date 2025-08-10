@@ -4,15 +4,16 @@ on:
   pull_request:
     branches:
       - main
+      
     workflow_dispatch:
-  
+
 jobs:
   lighthouse:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Run Lighthouse Check
-        uses: foo-software/lighthouse-check-action@v12
+        uses: foo-software/lighthouse-check-action@v12.0.1
         with:
           urls: 'https://shockt-project.de'
           uploadArtifacts: true
