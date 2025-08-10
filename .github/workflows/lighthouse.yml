@@ -1,0 +1,17 @@
+name: Lighthouse Check
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Lighthouse Check
+        uses: foo-software/lighthouse-check-action@v12
+        with:
+          urls: 'https://shockt-project.de'
+          uploadArtifacts: true
