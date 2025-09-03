@@ -137,7 +137,30 @@
         </div>
     </section>
 
-    <!-- Contact Section -->
+    <!-- Radio shockT Album Section -->
+<section id="radio-music" class="music section">
+    <h2>Radio shockT</h2>
+    <div class="album-container">
+        <img id="radio-album-cover" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAyADIDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDzvJbhn496MkfKH4/Sj73Cpz7Zo6fKU5/HNbjvLe/z118gyV+6/X0zR0+YPz+OaMFfvJ19c0YI+Ypx+lAe9/V9PMPvcs/PvmjJbhn496MFuVTj2o+9wqc+2aA97+r6htH99f1oo2P/AHG/KigOWX8n5/5iHb2JP1FHy46nP0pcFefl/Q0YJ+b5f0/lQLl1+HXtr9+4gx3JH0FHGepx9KXl/wC7x9BRkn5fl/T+dILLt+G/4/kIcZ4JP1FB29iT9RS5K8fL+howV5+X9DQFlrp66bfj+Y2inbz6L/3yKKCbQ7v7v+CIMZ5BP0NHGehx9aXJbhn496MkfKH4/SgdlbfT5X/MQ47Aj6mj5cdDn60uSv3X6+maOnzB+fxzTH/T2/AQbe4J+hoGM8gn6Gl+9yz8++aMluGfj3oDt+G34/8ABDKf3W/P/wCtRRtH99f1ooH7/l/5KNooopGIUUUUAFFFFABRRRQB/9k=" alt="Radio shockT Album Cover" />
+    </div>
+    <button id="radio-back-button" class="btn secondary" style="display:none; margin: 1rem auto;">Zurück</button>
+    <div id="radio-songs" class="songs">
+        <!-- Songs für Radio shockT werden später hinzugefügt -->
+    </div>
+    <button id="radio-play-all-btn" class="btn primary" style="margin: 1rem auto; display: none;">
+        Komplettes Album anhören
+    </button>
+    <div id="radio-album-player" class="album-player" style="display: none;">
+        <p class="album-player-title"><strong>Album Player</strong></p>
+        <div class="player-controls">
+            <button id="radio-prev-song-btn" class="btn secondary">Vorheriger Song</button>
+            <button id="radio-stop-player-btn" class="btn secondary">Stopp</button>
+            <button id="radio-next-song-btn" class="btn secondary">Nächster Song</button>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
     <section id="contact" class="contact section">
         <h2>Kontakt / Booking</h2>
         <!--
@@ -243,6 +266,124 @@
             var songsContainer = document.getElementById('album-songs');
             var backButton = document.getElementById('back-button');
             // Hide songs container and back button initially
+                    // Setup variables for Radio shockT album
+        var radioCover = document.getElementById('radio-album-cover');
+        var radioSongsContainer = document.getElementById('radio-songs');
+        var radioBackButton = document.getElementById('radio-back-button');
+        var radioPlayAllBtn = document.getElementById('radio-play-all-btn');
+        var radioAlbumPlayer = document.getElementById('radio-album-player');
+        var radioPrevBtn = document.getElementById('radio-prev-song-btn');
+        var radioNextBtn = document.getElementById('radio-next-song-btn');
+        var radioStopBtn = document.getElementById('radio-stop-player-btn');
+        // Hide radio songs and back button initially
+        if (radioSongsContainer) {
+            radioSongsContainer.style.display = 'none';
+        }
+        if (radioBackButton) {
+            radioBackButton.style.display = 'none';
+        }
+        if (radioPlayAllBtn) {
+            radioPlayAllBtn.style.display = 'none';
+        }
+        // Click handler for radio album cover with password check
+        if (radioCover && radioSongsContainer && radioBackButton) {
+            radioCover.addEventListener('click', function () {
+                var password = prompt('Bitte Passwort eingeben:');
+                if (password === 'Evo2025') {
+                    radioSongsContainer.style.display = 'grid';
+                    radioBackButton.style.display = 'inline-block';
+                    if (radioSongsContainer.querySelectorAll('audio').length > 0 && radioPlayAllBtn) {
+                        radioPlayAllBtn.style.display = 'block';
+                    }
+                } else if (password !== null) {
+                    alert('Falsches Passwort!');
+                }
+            });
+            radioBackButton.addEventListener('click', function () {
+                radioSongsContainer.style.display = 'none';
+                radioBackButton.style.display = 'none';
+                if (radioPlayAllBtn) {
+                    radioPlayAllBtn.style.display = 'none';
+                }
+                if (radioAlbumPlayer) {
+                    radioAlbumPlayer.style.display = 'none';
+                }
+            });
+        }
+        // Radio album sequential playback
+        var radioAudios = Array.prototype.slice.call(document.querySelectorAll('#radio-songs audio'));
+        var radioCurrentAudio = null;
+        var radioPlaying = false;
+        var radioPlayIndex = 0;
+        function playRadioSong(index) {
+            if (index < 0 || index >= radioAudios.length) {
+                return;
+            }
+            if (radioCurrentAudio && !radioCurrentAudio.paused) {
+                radioCurrentAudio.pause();
+                radioCurrentAudio.currentTime = 0;
+            }
+            radioCurrentAudio = radioAudios[index];
+            radioPlayIndex = index;
+            radioPlaying = true;
+            radioCurrentAudio.play();
+        }
+        function playRadioNext() {
+            var nextIndex = radioPlayIndex + 1;
+            if (nextIndex >= radioAudios.length) {
+                nextIndex = 0;
+            }
+            playRadioSong(nextIndex);
+        }
+        function playRadioPrev() {
+            var prevIndex = radioPlayIndex - 1;
+            if (prevIndex < 0) {
+                prevIndex = radioAudios.length - 1;
+            }
+            playRadioSong(prevIndex);
+        }
+        function stopRadioAll() {
+            radioPlaying = false;
+            if (radioCurrentAudio) {
+                radioCurrentAudio.pause();
+                radioCurrentAudio.currentTime = 0;
+            }
+        }
+        if (radioPlayAllBtn && radioAlbumPlayer) {
+            radioPlayAllBtn.addEventListener('click', function () {
+                radioAlbumPlayer.style.display = 'block';
+                if (radioSongsContainer) {
+                    radioSongsContainer.style.display = 'grid';
+                }
+                if (radioBackButton) {
+                    radioBackButton.style.display = 'inline-block';
+                }
+                playRadioSong(0);
+            });
+        }
+        if (radioNextBtn) {
+            radioNextBtn.addEventListener('click', function () {
+                playRadioNext();
+            });
+        }
+        if (radioPrevBtn) {
+            radioPrevBtn.addEventListener('click', function () {
+                playRadioPrev();
+            });
+        }
+        if (radioStopBtn) {
+            radioStopBtn.addEventListener('click', function () {
+                stopRadioAll();
+            });
+        }
+        radioAudios.forEach(function (aud) {
+            aud.addEventListener('ended', function () {
+                if (radioPlaying) {
+                    playRadioNext();
+                }
+            });
+        });
+
             if (songsContainer) {
                 songsContainer.style.display = 'none';
             }
@@ -263,8 +404,8 @@
                     // cover remains visible
                 });
             }
-                // Initialize play counters for each song
-                var audioElements = document.querySelectorAll('#album-songs audio');
+                // Initialize play counters for // var oldAudioElements = document.querySelectorAll('#album-songs audio');audioElements // = document'#album'#album-songs audio'audio, #radio-songs audio'('#album-s, #radio-songs audioongs audio');
+                    var audioElements = document.querySelectorAll('#album-songs audio, #radio-songs audio');
 
                 // Track the currently playing audio so that only one song plays at a time.
         var currentAudio = null;
