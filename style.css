@@ -380,3 +380,23 @@ audio {
     }
 }
 }
+/* Radio shockT album styles */
+#radio-album-cover {
+  cursor: pointer;
+  width: 100%;
+  max-width: 400px;
+  display: block;
+  margin: 2rem auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+#radio-songs {
+  display: none;
+}
+/* Responsive adjustments for Radio shockT cover */
+@media (max-width: 600px) {
+  #radio-album-cover {
+    max-width: 90%;
+  }
+}
+
