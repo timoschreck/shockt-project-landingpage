@@ -139,26 +139,102 @@
 
     <!-- Radio shockT Album Section -->
 <section id="radio-music" class="music section">
-    <h2>Radio shockT</h2>
-    <div class="album-container">
-        <img id="radio-album-cover" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAyADIDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDzvJbhn496MkfKH4/Sj73Cpz7Zo6fKU5/HNbjvLe/z118gyV+6/X0zR0+YPz+OaMFfvJ19c0YI+Ypx+lAe9/V9PMPvcs/PvmjJbhn496MFuVTj2o+9wqc+2aA97+r6htH99f1oo2P/AHG/KigOWX8n5/5iHb2JP1FHy46nP0pcFefl/Q0YJ+b5f0/lQLl1+HXtr9+4gx3JH0FHGepx9KXl/wC7x9BRkn5fl/T+dILLt+G/4/kIcZ4JP1FB29iT9RS5K8fL+howV5+X9DQFlrp66bfj+Y2inbz6L/3yKKCbQ7v7v+CIMZ5BP0NHGehx9aXJbhn496MkfKH4/SgdlbfT5X/MQ47Aj6mj5cdDn60uSv3X6+maOnzB+fxzTH/T2/AQbe4J+hoGM8gn6Gl+9yz8++aMluGfj3oDt+G34/8ABDKf3W/P/wCtRRtH99f1ooH7/l/5KNooopGIUUUUAFFFFABRRRQB/9k=" alt="Radio shockT Album Cover" />
+  <h2>Radio shockT</h2>
+  <div class="album-container">
+    <img
+      id="radio-album-cover"
+      src="data:image/jpeg;base64,[dein Albumcover als Base64]"
+      alt="Radio shockT Album Cover"
+    />
+  </div>
+  <button id="radio-back-button" class="btn secondary" style="display: none; margin: 1rem auto;">
+    Zurück
+  </button>
+  <!-- Hier beginnt der neue Song-Container -->
+  <div id="radio-songs" class="songs">
+    <div class="song">
+      <h3>Back to life</h3>
+      <audio controls>
+        <source src="songs/back_to_life.mp3" type="audio/mpeg" />
+        Your browser does not support the audio element.
+      </audio>
+      <span class="play-count" data-key="back-to-life">0</span>
     </div>
-    <button id="radio-back-button" class="btn secondary" style="display:none; margin: 1rem auto;">Zurück</button>
-    <div id="radio-songs" class="songs">
-        <!-- Songs für Radio shockT werden später hinzugefügt -->
+    <div class="song">
+      <h3>Between Stars and Streets</h3>
+      <audio controls>
+        <source src="songs/between_stars_and_streets.mp3" type="audio/mpeg" />
+        Your browser does not support the audio element.
+      </audio>
+      <span class="play-count" data-key="between-stars-and-streets">0</span>
     </div>
-    <button id="radio-play-all-btn" class="btn primary" style="margin: 1rem auto; display: none;">
-        Komplettes Album anhören
-    </button>
-    <div id="radio-album-player" class="album-player" style="display: none;">
-        <p class="album-player-title"><strong>Album Player</strong></p>
-        <div class="player-controls">
-            <button id="radio-prev-song-btn" class="btn secondary">Vorheriger Song</button>
-            <button id="radio-stop-player-btn" class="btn secondary">Stopp</button>
-            <button id="radio-next-song-btn" class="btn secondary">Nächster Song</button>
-        </div>
+    <div class="song">
+      <h3>HEART LOUD (Crown on) [Dance‑Pop Mix]</h3>
+      <audio controls>
+        <source src="songs/heart_loud_crown_on_dance_pop_mix.mp3" type="audio/mpeg" />
+        Your browser does not support the audio element.
+      </audio>
+      <span class="play-count" data-key="heart-loud-crown-on-dance-pop-mix">0</span>
     </div>
+    <div class="song">
+      <h3>Just do it!</h3>
+      <audio controls>
+        <source src="songs/just_do_it.mp3" type="audio/mpeg" />
+        Your browser does not support the audio element.
+      </audio>
+      <span class="play-count" data-key="just-do-it">0</span>
+    </div>
+    <div class="song">
+      <h3>Labyrinth der Träume – Club</h3>
+      <audio controls>
+        <source src="songs/labyrinth_der_traeume_club.mp3" type="audio/mpeg" />
+        Your browser does not support the audio element.
+      </audio>
+      <span class="play-count" data-key="labyrinth-der-traeume-club">0</span>
+    </div>
+    <div class="song">
+      <h3>Manifest</h3>
+      <audio controls>
+        <source src="songs/manifest.mp3" type="audio/mpeg" />
+        Your browser does not support the audio element.
+      </audio>
+      <span class="play-count" data-key="manifest">0</span>
+    </div>
+    <div class="song">
+      <h3>Sonne bricht auf</h3>
+      <audio controls>
+        <source src="songs/sonne_bricht_auf.mp3" type="audio/mpeg" />
+        Your browser does not support the audio element.
+      </audio>
+      <span class="play-count" data-key="sonne-bricht-auf">0</span>
+    </div>
+    <div class="song">
+      <h3>Steig ein!</h3>
+      <audio controls>
+        <source src="songs/steig_ein.mp3" type="audio/mpeg" />
+        Your browser does not support the audio element.
+      </audio>
+      <span class="play-count" data-key="steig-ein">0</span>
+    </div>
+  </div>
+  <button
+    id="radio-play-all-btn"
+    class="btn primary"
+    style="margin: 1rem auto; display: none;"
+  >
+    Komplettes Album anhören
+  </button>
+  <!-- Player‑Overlay und Buttons folgen wie beim ersten Album -->
+  <div id="radio-album-player" class="album-player" style="display: none;">
+    <p class="album-player-title"><strong>Album Player</strong></p>
+    <div class="player-controls">
+      <button id="radio-prev-song-btn" class="btn secondary">Vorheriger Song</button>
+      <button id="radio-stop-player-btn" class="btn secondary">Stopp</button>
+      <button id="radio-next-song-btn" class="btn secondary">Nächster Song</button>
+    </div>
+  </div>
 </section>
+
 
 <!-- Contact Section -->
     <section id="contact" class="contact section">
